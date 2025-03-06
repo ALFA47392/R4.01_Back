@@ -26,7 +26,7 @@ switch ($http_method){
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData,associative: true);
 
-        $reponse = createChuckFact($linkpdo, $data['phrase']);
+        $reponse = CréerJoueur($linkpdo, $data['numLicence'],$data['Nom'],$data['Prenom'],$data['DateNaissance'],$data['Taille'],$data['Poids'],$data['Statut']);
 
         if ($reponse['success']) {
             deliver_response(201, "Données crées avec succès.", $reponse['data']);

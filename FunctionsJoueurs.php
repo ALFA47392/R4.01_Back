@@ -46,18 +46,18 @@ function LireJoueur ($linkpdo,$id) {
     }
 }   
 
-function Créer($linkpdo,$phrase){
+function CréerJoueur($linkpdo,$numLicence,$nom,$prenom,$dateNaissance,$taille,$poids,$statut){
     try{
-        $req = "INSERT INTO `chuckn_facts` (`id`, `phrase`, `vote`, `date_ajout`, `date_modif`, `faute`, `signalement`) VALUES (:id, :phrase, :vote, :date_ajout, :date_modif, :faute, :signalement)";
+        $req = "INSERT INTO joueur (`Numero_de_licence`, `Nom`, `Prenom`, `Date_de_naissance`, `Taille`, `Poids`, `Statut`) VALUES (:Numero_de_licence, :Nom, :Prenom, :Date_de_naissance, :Taille, :Poids, :Statut)";
         $stmt = $linkpdo->prepare($req);
         $stmt->execute(array(
-        'id'=>null,
-        'phrase' => $phrase,
-        'vote' => null,
-        'date_ajout' => date('Y-m-d H:i:s'),
-        'date_modif' => date('Y-m-d H:i:s'),
-        'faute' => null,
-        'signalement' => null,
+        'Numero_de_licence'=>$numLicence,
+        'Nom' => $nom,
+        'Prenom' => $prenom,
+        'Date_de_naissance' => $dateNaissance,
+        'Taille' => $taille,
+        'Poids' => $poids,
+        'Statut' => $statut,
     ));
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -66,6 +66,27 @@ function Créer($linkpdo,$phrase){
             'success' => true,
             'data' => $data,
         ];
+    }catch(Exception){
+        return [
+            'success' => false,
+            'data' => null
+        ];
+    }
+}
+
+function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poids, $statut){
+    try {
+        $req = "UPDATE joueur SET Nom=:Nom,Prenom=:Prenom,Date_de_naissance=:Date_de_naissance,Taille=:Taille,Poids=:Poids,Statut=:Statut WHERE Numero_de_licence=:Numero_de_licence";
+        $stmt = $linkpdo->prepare($req);
+        $stmt->execute(array(
+            'Nom' => $nom,
+            'Prenom' => $prenom,
+            'Date_de_naissance' => $dateNaissance,
+            'Taille' => $taille,
+            'Poids' => $poids,
+            'Statut' => $statut,
+            'Numero_de_licence' => $id
+        ));
     }catch(Exception){
         return [
             'success' => false,
