@@ -22,6 +22,7 @@ function LireListeJoueur($linkpdo) {
         ];
     }
 }
+
 function LireJoueur ($linkpdo,$id) {
     try{
         $req = "SELECT * FROM joueur WHERE Numero_de_licence = :Numero_de_licence";
@@ -57,7 +58,7 @@ function CréerJoueur($linkpdo,$numLicence,$nom,$prenom,$dateNaissance,$taille,$
         'Date_de_naissance' => $dateNaissance,
         'Taille' => $taille,
         'Poids' => $poids,
-        'Statut' => $statut,
+        'Statut' => $statut
     ));
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -74,25 +75,80 @@ function CréerJoueur($linkpdo,$numLicence,$nom,$prenom,$dateNaissance,$taille,$
     }
 }
 
-function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poids, $statut){
+function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poids, $statut) {
     try {
-        $req = "UPDATE joueur SET Nom=:Nom,Prenom=:Prenom,Date_de_naissance=:Date_de_naissance,Taille=:Taille,Poids=:Poids,Statut=:Statut WHERE Numero_de_licence=:Numero_de_licence";
+        // Vérifier si le joueur existe en utilisant LireJoueur
+        $joueurExistant = LireJoueur($linkpdo, $id);
+        
+        if (!$joueurExistant['success'] || empty($joueurExistant['data'])) {
+            return [
+                'success' => false,
+                'status_code' => 404,
+                'status_message' => "Joueur non trouvé",
+                'data' => null
+            ];
+        }
+
+        // Construction dynamique de la requête
+        $fields = [];
+        $params = ['id' => $id];
+
+        if ($nom !== null) {
+            $fields[] = "Nom = :Nom";
+            $params['Nom'] = $nom;
+        }
+        if ($prenom !== null) {
+            $fields[] = "Prenom = :Prenom";
+            $params['Prenom'] = $prenom;
+        }
+        if ($dateNaissance !== null) {
+            $fields[] = "Date_de_naissance = :Date_de_naissance";
+            $params['Date_de_naissance'] = $dateNaissance;
+        }
+        if ($taille !== null) {
+            $fields[] = "Taille = :Taille";
+            $params['Taille'] = $taille;
+        }
+        if ($poids !== null) {
+            $fields[] = "Poids = :Poids";
+            $params['Poids'] = $poids;
+        }
+        if ($statut !== null) {
+            $fields[] = "Statut = :Statut";
+            $params['Statut'] = $statut;
+        }
+
+        if (empty($fields)) {
+            return [
+                'success' => false,
+                'status_code' => 400,
+                'status_message' => "Aucun champ à mettre à jour",
+                'data' => null
+            ];
+        }
+
+        $req = "UPDATE joueur SET " . implode(", ", $fields) . " WHERE Numero_de_licence = :id";
         $stmt = $linkpdo->prepare($req);
-        $stmt->execute(array(
-            'Nom' => $nom,
-            'Prenom' => $prenom,
-            'Date_de_naissance' => $dateNaissance,
-            'Taille' => $taille,
-            'Poids' => $poids,
-            'Statut' => $statut,
-            'Numero_de_licence' => $id
-        ));
-    }catch(Exception){
+        $stmt->execute($params);
+
+        // Récupérer les nouvelles données après la mise à jour
+        $joueurMisAJour = LireJoueur($linkpdo, $id);
+
+        return [
+            'success' => true,
+            'status_code' => 200,
+            'status_message' => "Joueur mis à jour avec succès",
+            'data' => $joueurMisAJour['data']
+        ];
+    } catch (Exception $e) {
         return [
             'success' => false,
+            'status_code' => 500,
+            'status_message' => "Erreur : " . $e->getMessage(),
             'data' => null
         ];
     }
 }
+
 
 ?>
