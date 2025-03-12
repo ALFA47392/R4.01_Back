@@ -1,7 +1,7 @@
 <?php
 include 'connexionBD.php';
 include 'functions.php';
-include 'functionsJoueurs.php';
+include 'functionsMatch.php';
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
@@ -10,7 +10,7 @@ switch ($http_method){
         //Récupération des données dans l’URL si nécessaire
         if(!isset($_GET['id'])) { 
             //Appel de la fonction de lecture des phrases 
-            $matchingData=LireListeJoueur($linkpdo);
+            $matchingData=LireListeMatch($linkpdo);
             //Réponse à afficher
             deliver_response(200, "Succès", $matchingData);
         } else {
