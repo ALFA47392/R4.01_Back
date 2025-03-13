@@ -150,5 +150,23 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
     }
 }
 
-
+function deleteJoueur($linkpdo,$id){
+    try{
+        $req = "DELETE FROM joueur WHERE Numero_de_licence = :id";
+        $stmt = $linkpdo->prepare($req);
+        $stmt->execute(['id'=>$id]);
+    
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return [
+            'success' => true,
+            'data' => $data,
+        ];
+    }catch(Exception){
+        return [
+            'success' => false,
+            'data' => null
+        ];
+    }
+}
 ?>

@@ -60,7 +60,7 @@ switch ($http_method){
     case "DEL" :
         if (isset($_GET['id'])) {
             $id = htmlspecialchars($_GET['id']);
-            $reponse = deleteChuckFact($linkpdo, $id);
+            $reponse = deleteMatch($linkpdo, $id);
             
             if ($reponse['success']) {
                 deliver_response(200, "Données id:'$id' supprimée avec succès.", $reponse['data']);

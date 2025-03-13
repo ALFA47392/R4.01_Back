@@ -47,18 +47,16 @@ function LireMatch ($linkpdo,$id) {
     }
 }   
 
-function CréerJoueur($linkpdo,$numLicence,$nom,$prenom,$dateNaissance,$taille,$poids,$statut){
+function CréerMatch($linkpdo,$idMatch,$Date_Heure_match,$Nom_equipe_adverse,$Lieu_de_rencontre,$scoreMatch){
     try{
-        $req = "INSERT INTO joueur (`Numero_de_licence`, `Nom`, `Prenom`, `Date_de_naissance`, `Taille`, `Poids`, `Statut`) VALUES (:Numero_de_licence, :Nom, :Prenom, :Date_de_naissance, :Taille, :Poids, :Statut)";
+        $req = "INSERT INTO Match_Hockey (`Id_Match_Hockey`, `Date_Heure_match`, `Nom_equipe_adverse`, `Lieu_de_rencontre`, `ScoreMatch`) VALUES (:Id_Match_Hockey, :Date_Heure_match, :Nom_equipe_adverse, :Lieu_de_rencontre, :ScoreMatch)";
         $stmt = $linkpdo->prepare($req);
         $stmt->execute(array(
-        'Numero_de_licence'=>$numLicence,
-        'Nom' => $nom,
-        'Prenom' => $prenom,
-        'Date_de_naissance' => $dateNaissance,
-        'Taille' => $taille,
-        'Poids' => $poids,
-        'Statut' => $statut
+        'Id_Match_Hockey'=>$idMatch,
+        'Date_Heure_match' => $Date_Heure_match,
+        'Nom_equipe_adverse' => $Nom_equipe_adverse,
+        'Lieu_de_rencontre' => $Lieu_de_rencontre,
+        'ScoreMatch' => $scoreMatch
     ));
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -75,12 +73,12 @@ function CréerJoueur($linkpdo,$numLicence,$nom,$prenom,$dateNaissance,$taille,$
     }
 }
 
-function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poids, $statut) {
+function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, $Lieu_de_rencontre, $scoreMatch) {
     try {
         // Vérifier si le joueur existe en utilisant LireJoueur
-        $joueurExistant = LireJoueur($linkpdo, $id);
+        $matchExistant = LireMatch($linkpdo, $idMatch);
         
-        if (!$joueurExistant['success'] || empty($joueurExistant['data'])) {
+        if (!$matchExistant['success'] || empty($matchExistant['data'])) {
             return [
                 'success' => false,
                 'status_code' => 404,
@@ -93,29 +91,21 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
         $fields = [];
         $params = ['id' => $id];
 
-        if ($nom !== null) {
-            $fields[] = "Nom = :Nom";
-            $params['Nom'] = $nom;
+        if (isset($Date_Heure_match)) {
+            $fields[] = "Date_Heure_match = :Date_Heure_match";
+            $params['Date_Heure_match'] = $Date_Heure_match;
         }
-        if ($prenom !== null) {
-            $fields[] = "Prenom = :Prenom";
-            $params['Prenom'] = $prenom;
+        if (isset($Nom_equipe_adverse)) {
+            $fields[] = "Nom_equipe_adverse = :Nom_equipe_adverse";
+            $params['Nom_equipe_adverse'] = $Nom_equipe_adverse;
         }
-        if ($dateNaissance !== null) {
-            $fields[] = "Date_de_naissance = :Date_de_naissance";
-            $params['Date_de_naissance'] = $dateNaissance;
+        if (isset($Lieu_de_rencontre)) {
+            $fields[] = "Lieu_de_rencontre = :Lieu_de_rencontre";
+            $params['Lieu_de_rencontre'] = $Lieu_de_rencontre;
         }
-        if ($taille !== null) {
-            $fields[] = "Taille = :Taille";
-            $params['Taille'] = $taille;
-        }
-        if ($poids !== null) {
-            $fields[] = "Poids = :Poids";
-            $params['Poids'] = $poids;
-        }
-        if ($statut !== null) {
-            $fields[] = "Statut = :Statut";
-            $params['Statut'] = $statut;
+        if (isset($scoreMatch)) {
+            $fields[] = "ScoreMatch = :ScoreMatch";
+            $params['ScoreMatch'] = $scoreMatch;
         }
 
         if (empty($fields)) {
@@ -127,12 +117,12 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
             ];
         }
 
-        $req = "UPDATE joueur SET " . implode(", ", $fields) . " WHERE Numero_de_licence = :id";
+        $req = "UPDATE Match_Hockey SET " . implode(", ", $fields) . " WHERE id_match_hockey = :idMatch";
         $stmt = $linkpdo->prepare($req);
         $stmt->execute($params);
 
         // Récupérer les nouvelles données après la mise à jour
-        $joueurMisAJour = LireJoueur($linkpdo, $id);
+        $joueurMisAJour = LireMatch($linkpdo, $id);
 
         return [
             'success' => true,

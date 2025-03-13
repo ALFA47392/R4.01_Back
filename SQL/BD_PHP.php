@@ -1,4 +1,5 @@
 <?php
+include '../connexionBD.php';
 // MISE EN PLACE BD
 $sql = file_get_contents("./SQL/Creation_BD.sql");
 try{
