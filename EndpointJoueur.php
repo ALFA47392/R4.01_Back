@@ -57,10 +57,10 @@ switch ($http_method){
 
     break;
 
-    case "DEL" :
+    case "DELETE" :
         if (isset($_GET['id'])) {
             $id = htmlspecialchars($_GET['id']);
-            $reponse = deleteMatch($linkpdo, $id);
+            $reponse = deleteJoueur($linkpdo, $id);
             
             if ($reponse['success']) {
                 deliver_response(200, "Données id:'$id' supprimée avec succès.", $reponse['data']);

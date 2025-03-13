@@ -82,14 +82,14 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
             return [
                 'success' => false,
                 'status_code' => 404,
-                'status_message' => "Joueur non trouvé",
+                'status_message' => "Match non trouvé",
                 'data' => null
             ];
         }
 
         // Construction dynamique de la requête
         $fields = [];
-        $params = ['id' => $id];
+        $params = ['idMatch' => $idMatch];
 
         if (isset($Date_Heure_match)) {
             $fields[] = "Date_Heure_match = :Date_Heure_match";
@@ -122,19 +122,52 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
         $stmt->execute($params);
 
         // Récupérer les nouvelles données après la mise à jour
-        $joueurMisAJour = LireMatch($linkpdo, $id);
+        $matchMisAJour = LireMatch($linkpdo, $idMatch);
+        
 
         return [
             'success' => true,
             'status_code' => 200,
             'status_message' => "Joueur mis à jour avec succès",
-            'data' => $joueurMisAJour['data']
+            'data' => $matchMisAJour['data']
         ];
     } catch (Exception $e) {
         return [
             'success' => false,
             'status_code' => 500,
             'status_message' => "Erreur : " . $e->getMessage(),
+            'data' => null
+        ];
+    }
+}
+
+function deleteMatch($linkpdo,$id){
+    // Vérifier si le joueur existe en utilisant LireJoueur
+    $matchExistant = LireMatch($linkpdo, $id);
+        
+    if (!$matchExistant['success'] || empty($matchExistant['data'])) {
+        return [
+            'success' => false,
+            'status_code' => 404,
+            'status_message' => "Match non trouvé",
+            'data' => null
+        ];
+    }
+
+    try{
+        $req = "DELETE FROM match_hockey WHERE Id_match_hockey = :idMatch";
+        $stmt = $linkpdo->prepare($req);
+        $stmt->execute(['idMatch'=>$id]);
+    
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return [
+            'success' => true,
+            'data' => $data,
+        ];
+    }catch(Exception){
+        return [
+            'success' => false,
             'data' => null
         ];
     }

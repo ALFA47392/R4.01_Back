@@ -46,9 +46,9 @@ switch ($http_method){
             $reponse = patchMatch($linkpdo,$id,$data['Date_Heure_match'],$data['Nom_equipe_adverse'],$data['Lieu_de_rencontre'],$data['ScoreMatch']);
     
             if ($reponse['success']) {
-                deliver_response(201, "Données crées avec succès.", $reponse['data']);
+                deliver_response(201, "Données mises à jour avec succès.", $reponse['data']);
             } else {
-                deliver_response(404, "Not Found", null);
+                deliver_response(404, "Id présent MAIS erreur dans la modfication", null);
             }
         }
         
@@ -57,8 +57,10 @@ switch ($http_method){
 
     break;
 
-    case "DEL" :
-        if (isset($_GET['id'])) {
+    case "DELETE" :    
+        if (!isset($_GET['id'])) {
+            deliver_response(400, "Paramètre id invalide", null);
+        }else{
             $id = htmlspecialchars($_GET['id']);
             $reponse = deleteMatch($linkpdo, $id);
             
@@ -67,11 +69,10 @@ switch ($http_method){
             } else {
                 deliver_response(404, "Not Found", null);
             }
-        }else{
-            deliver_response(400, "Paramètre id invalide", null);
 
         }
     break;
+
 
     case "OPTIONS" :
         deliver_response(201,"Normalement c'est ça lol",null);
