@@ -51,54 +51,26 @@ function LireParticiper($linkpdo, $idmatchhokey) {
 
 function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
-        // Test de la connexion à la base de données
-        var_dump($linkpdo);  // Vérifie que la connexion est bien établie
-        
-        // Vérification des données reçues
-        var_dump($numero_licence, $id_match_hockey, $titulaire, $notation, $poste);  // Affiche les données envoyées à la fonction
-        
-        $req = "INSERT INTO `Participer` (`Numero_Licence`, `Id_Match_Hockey`, `Titulaire`, `Notation`, `Poste`) VALUES (:numero_licence, :id_match_hockey, :titulaire, :notation, :poste)";
-        
-        // Test de la requête
-        var_dump($req);  // Affiche la requête SQL pour vérification
-        
+        $req = "INSERT INTO `Participer` (`Numero_de_licence`, `Id_Match_Hockey`, `Titulaire`, `Notation`, `Poste`) 
+        VALUES (:numero_de_licence, :id_match_hockey, :titulaire, :notation, :poste)";
+
         $stmt = $linkpdo->prepare($req);
+ 
+        $stmt->execute([
+            ':numero_de_licence' => $numero_licence,
+            ':id_match_hockey' => $id_match_hockey,
+            ':titulaire' => $titulaire,
+            ':notation' => $notation,
+            ':poste' => $poste
+        ]);
         
-        // Vérification si la préparation de la requête a échoué
-        if ($stmt === false) {
-            throw new Exception("Échec de la préparation de la requête SQL. Erreur : " . implode(", ", $linkpdo->errorInfo()));
-        }
 
-        $executeResult = $stmt->execute(array(
-            'numero_licence' => $numero_licence,
-            'id_match_hockey' => $id_match_hockey,
-            'titulaire' => $titulaire,
-            'notation' => $notation,
-            'poste' => $poste
-        ));
-        
-        // Vérification du résultat de l'exécution
-        if (!$executeResult) {
-            throw new Exception("Échec de l'exécution de la requête SQL. Erreur : " . implode(", ", $stmt->errorInfo()));
-        }
-
-        // Test de l'exécution
-        var_dump($stmt->rowCount());  // Affiche le nombre de lignes affectées
-        
-        return [
-            'success' => true,
-            'data' => null,
-        ];
-    } catch (PDOException $e) {
-        // Affiche le message d'erreur détaillé pour la base de données
-        throw new Exception("Erreur PDO : " . $e->getMessage());
+        return ['success' => true, 'data' => null];
     } catch (Exception $e) {
-        // Affiche des erreurs plus explicites
-        throw new Exception("Erreur générale : " . $e->getMessage());
+        error_log("Erreur SQL : " . $e->getMessage()); // Enregistre l'erreur dans les logs
+        return ['success' => false, 'data' => $e->getMessage()];
     }
 }
-
-
 function MAJFeuilleMatch($linkpdo, $id, $phrase, $vote, $faute, $signalement) {
     try {
         $req = "UPDATE chuckn_facts SET phrase=:phrase, vote=:vote, date_modif=:date_modif, faute=:faute, signalement=:signalement WHERE id=:id";

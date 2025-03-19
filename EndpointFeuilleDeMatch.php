@@ -24,26 +24,44 @@ switch ($http_method){
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    case "POST" : 
-        // Récupération des données dans le corps 
-        $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData, true);
-
-        $reponse = createParticiper(
-            $linkpdo, 
-            $data['numero_licence'], 
-            $data['id_match_hockey'], 
-            $data['titulaire'], 
-            $data['notation'], 
-            $data['poste']
-        );
-
-        if ($reponse['success']) {
-            deliver_response(201, "Données créées avec succès.", $reponse['data']);
+    case "POST" :
+        // Vérification de la méthode HTTP
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Récupération et décodage des données JSON envoyées
+            $postedData = file_get_contents('php://input');
+            $data = json_decode(trim($postedData), true);
+    
+            // Vérification que les données existent
+            if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+                echo json_encode(["status_code" => 400, "status_message" => "Données manquantes"]);
+                exit;
+            }
+    
+            // Appel de la fonction
+            $reponse = createParticiper(
+                $linkpdo, 
+                $data['numero_de_licence'], 
+                $data['id_match_hockey'], 
+                $data['titulaire'], 
+                $data['notation'], 
+                $data['poste']
+            );
+    
+            // Réponse en fonction du succès ou non
+            if ($reponse['success']) {
+                http_response_code(201);
+                echo json_encode(["status_code" => 201, "status_message" => "Données créées avec succès"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["status_code" => 500, "status_message" => "Erreur serveur", "error" => $reponse['data']]);
+            }
         } else {
-            deliver_response(404, "Not Found", null);
+            http_response_code(405);
+            echo json_encode(["status_code" => 405, "status_message" => "Méthode non autorisée"]);
         }
     break;
+
+
 
 
     case "PATCH" :
