@@ -1,7 +1,7 @@
 <?php
-include 'connexionBD.php';
-include 'functions.php';
-include 'FunctionsFeuilleDeMatch.php';
+include '../connexionBD.php';
+include '../Functions/functions.php';
+include '../Functions/FunctionsFeuilleDeMatch.php';
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
