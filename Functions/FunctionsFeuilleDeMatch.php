@@ -1,27 +1,4 @@
 <?php
-function LireFeuilleMatch($linkpdo) {
-    try {
-        $query = "SELECT * FROM chuckn_facts";
-        $stmt = $linkpdo->prepare($query);
-        $stmt->execute();
-            
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return [
-            'success' => true,
-            'status_code' => 200,
-            'status_message' => "Données récupérées avec succès.",
-            'data' => $data
-        ];
-    } catch (Exception $e) {
-        return [
-            'success' => false,
-            'status_code' => 404,
-            'status_message' => "Not Found",
-            'data' => null
-        ];
-    }
-}
 
 function LireParticiper($linkpdo, $idmatchhokey) {
     try {
