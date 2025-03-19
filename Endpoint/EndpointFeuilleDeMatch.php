@@ -22,7 +22,6 @@ switch ($http_method){
         }
     break; 
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     case "POST" :
         // Vérification de la méthode HTTP
@@ -64,60 +63,47 @@ switch ($http_method){
 
 
 
-    case "PATCH" :
-        if(!isset($_GET['id'])) {
-            deliver_response(400, "Paramètre id invalide", null);
-        } else {
-            $id = htmlspecialchars($_GET['id']);
-            // Récupération des données dans le corps 
-            $postedData = file_get_contents('php://input');
-            $data = json_decode($postedData, true);
-    
-            $reponse = patchChuckFact($linkpdo, $id, $data['phrase'], $data['vote'], $data['faute'], $data['signalement']);
-    
-            if ($reponse['success']) {
-                deliver_response(201, "Données mises à jour avec succès.", $reponse['data']);
-            } else {
-                deliver_response(404, "Not Found", null);
-            }
-        }
+case 'PATCH':
+    $postedData = file_get_contents('php://input');
+    $data = json_decode(trim($postedData), true);
+
+    if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+        deliver_response(400, "Données manquantes", null);
+        exit;
+    }
+
+    $reponse = updateParticiper(
+        $linkpdo,
+        $data['numero_de_licence'],
+        $data['id_match_hockey'],
+        $data['titulaire'],
+        $data['notation'],
+        $data['poste']
+    );
+
+    if ($reponse['success']) {
+        deliver_response(200, "Mise à jour réussie.", $reponse['data']);
+    } else {
+        deliver_response(404, "Aucune mise à jour effectuée.", null);
+    }
     break;
 
-    case "PUT" :
-        if(!isset($_GET['id'])) {
-            deliver_response(400, "Paramètre id invalide", null);
-        } else {
-            $id = htmlspecialchars($_GET['id']);
-            // Récupération des données dans le corps 
-            $postedData = file_get_contents('php://input');
-            $data = json_decode($postedData, true);
-    
-            $reponse = putChuckFact($linkpdo, $id, $data['phrase'], $data['vote'], $data['faute'], $data['signalement']);
-    
-            if ($reponse['success']) {
-                deliver_response(201, "Données mises à jour avec succès.", $reponse['data']);
-            } else {
-                deliver_response(404, "Not Found", null);
-            }
-        }
-    break;
-    case "DELETE" :
-        if (isset($_GET['id'])) {
-            $id = htmlspecialchars($_GET['id']);
-            $reponse = deleteChuckFact($linkpdo, $id);
-            
-            if ($reponse['success']) {
-                deliver_response(200, "Données id:'$id' supprimée avec succès.", $reponse['data']);
-            } else {
-                deliver_response(404, "Not Found", null);
-            }
-        } else {
-            deliver_response(400, "Paramètre id invalide", null);
-        }
-    break;
-    case "OPTIONS" :
-        deliver_response(201, "Normalement c'est ça lol", null);
-    break;
-}
 
-?>
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    case 'DELETE':
+        if (!isset($_GET['numero_de_licence'], $_GET['id_match_hockey'])) {
+            deliver_response(400, "Données manquantes", null);
+            exit;
+        }
+    
+        $reponse = deleteParticiper($linkpdo, $_GET['numero_de_licence'], $_GET['id_match_hockey']);
+    
+        if ($reponse['success']) {
+            deliver_response(200, "Suppression réussie.", $reponse['data']);
+        } else {
+            deliver_response(404, "Aucune suppression effectuée.", null);
+        }
+        break;
+}    
+?> 

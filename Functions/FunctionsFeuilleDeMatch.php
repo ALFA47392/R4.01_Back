@@ -47,7 +47,6 @@ function LireParticiper($linkpdo, $idmatchhokey) {
     }
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
@@ -71,47 +70,53 @@ function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulair
         return ['success' => false, 'data' => $e->getMessage()];
     }
 }
-function MAJFeuilleMatch($linkpdo, $id, $phrase, $vote, $faute, $signalement) {
-    try {
-        $req = "UPDATE chuckn_facts SET phrase=:phrase, vote=:vote, date_modif=:date_modif, faute=:faute, signalement=:signalement WHERE id=:id";
-        $stmt = $linkpdo->prepare($req);
-        $stmt->execute(array(
-            'phrase' => $phrase,
-            'vote' => $vote,
-            'date_modif' => date('Y-m-d H:i:s'),
-            'faute' => $faute,
-            'signalement' => $signalement,
-            'id' => $id
-        ));
 
-        return [
-            'success' => true,
-            'data' => null,
-        ];
+
+function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titulaire, $notation, $poste) {
+    try {
+        $req = "UPDATE `Participer` 
+                SET Titulaire = :titulaire, Notation = :notation, Poste = :poste
+                WHERE Numero_de_licence = :numero_de_licence 
+                AND Id_Match_Hockey = :id_match_hockey";
+
+        $stmt = $linkpdo->prepare($req);
+        $stmt->execute([
+            ':numero_de_licence' => $numero_de_licence,
+            ':id_match_hockey' => $id_match_hockey,
+            ':titulaire' => $titulaire,
+            ':notation' => $notation,
+            ':poste' => $poste
+        ]);
+
+        if ($stmt->rowCount() > 0) {
+            return ['success' => true, 'data' => "Mise à jour réussie"];
+        } else {
+            return ['success' => false, 'data' => "Aucune ligne modifiée"];
+        }
     } catch (Exception $e) {
-        return [
-            'success' => false,
-            'data' => null
-        ];
+        return ['success' => false, 'data' => $e->getMessage()];
     }
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-function DELFeuilleMatch($linkpdo, $id) {
+function deleteParticiper($linkpdo, $numero_de_licence, $id_match_hockey) {
     try {
-        $req = "DELETE FROM chuckn_facts WHERE id = :id";
+        $req = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
         $stmt = $linkpdo->prepare($req);
-        $stmt->execute(['id' => $id]);
-    
-        return [
-            'success' => true,
-            'data' => null,
-        ];
+        $stmt->execute([
+            ':numero_de_licence' => $numero_de_licence,
+            ':id_match_hockey' => $id_match_hockey
+        ]);
+
+        if ($stmt->rowCount() > 0) {
+            return ['success' => true, 'data' => "Suppression réussie"];
+        } else {
+            return ['success' => false, 'data' => "Aucune ligne supprimée"];
+        }
     } catch (Exception $e) {
-        return [
-            'success' => false,
-            'data' => null
-        ];
+        return ['success' => false, 'data' => $e->getMessage()];
     }
 }
+
 ?>
