@@ -1,7 +1,7 @@
 <?php
-include 'connexionBD.php';
-include 'functions.php';
-include 'functionsMatch.php';
+include '../connexionBD.php';
+include '../Functions/functions.php';
+include '../Functions/functionsJoueurs.php';
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
@@ -10,13 +10,13 @@ switch ($http_method){
         //Récupération des données dans l’URL si nécessaire
         if(!isset($_GET['id'])) { 
             //Appel de la fonction de lecture des phrases 
-            $matchingData=LireListeMatch($linkpdo);
+            $matchingData=LireListeJoueur($linkpdo);
             //Réponse à afficher
             deliver_response(200, "Succès", $matchingData);
         } else {
             $id=htmlspecialchars($_GET['id']);
             //Appel de la fonction de lecture des phrases 
-            $matchingData=LireMatch($linkpdo,$id);
+            $matchingData=LireJoueur($linkpdo,$id);
             //Réponse à afficher
             deliver_response(200, "Succès", $matchingData);
         }
@@ -26,7 +26,7 @@ switch ($http_method){
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData,associative: true);
 
-        $reponse = CréerMatch($linkpdo, $data['Id_Match_Hockey'],$data['Date_Heure_match'],$data['Nom_equipe_adverse'],$data['Lieu_de_rencontre'],$data['ScoreMatch']);
+        $reponse = CréerJoueur($linkpdo, $data['numLicence'],$data['Nom'],$data['Prenom'],$data['DateNaissance'],$data['Taille'],$data['Poids'],$data['Statut']);
 
         if ($reponse['success']) {
             deliver_response(201, "Données crées avec succès.", $reponse['data']);
@@ -43,12 +43,12 @@ switch ($http_method){
             $postedData = file_get_contents('php://input');
             $data = json_decode($postedData,associative: true);
     
-            $reponse = patchMatch($linkpdo,$id,$data['Date_Heure_match'],$data['Nom_equipe_adverse'],$data['Lieu_de_rencontre'],$data['ScoreMatch']);
+            $reponse = patchJoueur($linkpdo,$id,$data['Nom'],$data['Prenom'],$data['DateNaissance'],$data['Taille'],$data['Poids'],$data['Statut']);
     
             if ($reponse['success']) {
-                deliver_response(201, "Données mises à jour avec succès.", $reponse['data']);
+                deliver_response(201, "Données crées avec succès.", $reponse['data']);
             } else {
-                deliver_response(404, "Id présent MAIS erreur dans la modfication", null);
+                deliver_response(404, "Not Found", null);
             }
         }
         
@@ -57,22 +57,21 @@ switch ($http_method){
 
     break;
 
-    case "DELETE" :    
-        if (!isset($_GET['id'])) {
-            deliver_response(400, "Paramètre id invalide", null);
-        }else{
+    case "DELETE" :
+        if (isset($_GET['id'])) {
             $id = htmlspecialchars($_GET['id']);
-            $reponse = deleteMatch($linkpdo, $id);
+            $reponse = deleteJoueur($linkpdo, $id);
             
             if ($reponse['success']) {
                 deliver_response(200, "Données id:'$id' supprimée avec succès.", $reponse['data']);
             } else {
                 deliver_response(404, "Not Found", null);
             }
+        }else{
+            deliver_response(400, "Paramètre id invalide", null);
 
         }
     break;
-
 
     case "OPTIONS" :
         deliver_response(201,"Normalement c'est ça lol",null);

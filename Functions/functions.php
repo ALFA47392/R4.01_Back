@@ -1,5 +1,5 @@
 <?php
-include 'connexionBD.php';
+include '../connexionBD.php';
 
 // Récupération des données dans le corps 
 $postedData = file_get_contents('php://input'); 
