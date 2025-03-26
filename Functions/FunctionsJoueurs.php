@@ -169,4 +169,5 @@ function deleteJoueur($linkpdo,$id){
         ];
     }
 }
+
 ?>

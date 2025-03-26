@@ -2,8 +2,16 @@
 include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/functionsStats.php';
+include '../Functions/functionsGeneral.php';
+
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD']; 
+
+// Récupération du token Bearer depuis les headers
+$token = get_bearer_token();
+
+//Vérification validité de l'authentification
+verif_auth($token,$auth);
 
 switch ($http_method){ 
     case "GET" : 
