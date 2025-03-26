@@ -1,8 +1,20 @@
 <?php
+<<<<<<< Updated upstream:Endpoint/EndpointJoueur.php
 include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/functionsJoueurs.php';
 include '../Functions/functionsGeneral.php';
+=======
+include 'conf.php';
+include 'connexionBD.php'; // Assurez-vous que ce fichier initialise $linkpdo
+include 'functions.php';
+include 'functionsJoueurs.php';
+
+// Assurez-vous que $linkpdo est bien défini
+if (!isset($linkpdo)) {
+    die('Erreur de connexion à la base de données');
+}
+>>>>>>> Stashed changes:EndpointJoueur.php
 
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
@@ -31,7 +43,7 @@ switch ($http_method){
     case "POST" : 
         // Récupération des données dans le corps 
         $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData,associative: true);
+        $data = json_decode($postedData, true);
 
         $reponse = CréerJoueur($linkpdo, $data['numLicence'],$data['Nom'],$data['Prenom'],$data['DateNaissance'],$data['Taille'],$data['Poids'],$data['Statut']);
 
@@ -40,7 +52,7 @@ switch ($http_method){
         } else {
             deliver_response(404, "Not Found", null);
         }
-    
+    break;
     case "PATCH" :
         if(!isset($_GET['id'])) {
             deliver_response(400, "Paramètre id invalide", null);
@@ -86,4 +98,3 @@ switch ($http_method){
 }
 
 ?>
-
