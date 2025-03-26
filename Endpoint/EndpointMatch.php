@@ -3,6 +3,7 @@ include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/functionsMatch.php';
 include '../Functions/functionsGeneral.php';
+
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD']; 
 

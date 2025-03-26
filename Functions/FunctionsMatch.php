@@ -57,8 +57,6 @@ function CréerMatch($linkpdo,$idMatch,$Date_Heure_match,$Nom_equipe_adverse,$Li
         'Nom_equipe_adverse' => $Nom_equipe_adverse,
         'Lieu_de_rencontre' => $Lieu_de_rencontre,
         'ScoreMatch' => $scoreMatch
-    ));
-
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
@@ -157,6 +155,10 @@ function deleteMatch($linkpdo,$id){
     try{
         $req = "DELETE FROM match_hockey WHERE Id_match_hockey = :idMatch";
         $stmt = $linkpdo->prepare($req);
+        $stmt->execute(['idMatch'=>$id]);
+
+        $req2 = "DELETE FROM Participer WHERE Id_match_hockey = :idMatch";
+        $stmt = $linkpdo->prepare($req2);
         $stmt->execute(['idMatch'=>$id]);
     
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
