@@ -1,4 +1,7 @@
 <?php
+
+include '../SQL/Variables_SQL.php';
+
 function LireListeJoueur($linkpdo) {
     try{
         $query = "SELECT * FROM joueur";
