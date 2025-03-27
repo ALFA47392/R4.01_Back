@@ -76,7 +76,6 @@ function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titul
     }
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function deleteParticiper($linkpdo, $numero_de_licence, $id_match_hockey) {
     try {
