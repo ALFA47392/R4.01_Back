@@ -1,9 +1,10 @@
 <?php
 
+include '../SQL/Variables_SQL.php';
+
 function LireParticiper($linkpdo, $idmatchhokey) {
     try {
-        $query = "SELECT * FROM Participer WHERE Id_Match_Hockey = :idmatchhokey";
-        $stmt = $linkpdo->prepare($query);
+        $stmt = $linkpdo->prepare($sql_select_FDM);
         $stmt->execute(['idmatchhokey' => $idmatchhokey]);
         
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -27,10 +28,7 @@ function LireParticiper($linkpdo, $idmatchhokey) {
 
 function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
-        $req = "INSERT INTO `Participer` (`Numero_de_licence`, `Id_Match_Hockey`, `Titulaire`, `Notation`, `Poste`) 
-        VALUES (:numero_de_licence, :id_match_hockey, :titulaire, :notation, :poste)";
-
-        $stmt = $linkpdo->prepare($req);
+        $stmt = $linkpdo->prepare($sql_create_FDM);
  
         $stmt->execute([
             ':numero_de_licence' => $numero_licence,
@@ -51,12 +49,7 @@ function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulair
 
 function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
-        $req = "UPDATE `Participer` 
-                SET Titulaire = :titulaire, Notation = :notation, Poste = :poste
-                WHERE Numero_de_licence = :numero_de_licence 
-                AND Id_Match_Hockey = :id_match_hockey";
-
-        $stmt = $linkpdo->prepare($req);
+        $stmt = $linkpdo->prepare($sql_update_FDM);
         $stmt->execute([
             ':numero_de_licence' => $numero_de_licence,
             ':id_match_hockey' => $id_match_hockey,
@@ -79,8 +72,7 @@ function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titul
 
 function deleteParticiper($linkpdo, $numero_de_licence, $id_match_hockey) {
     try {
-        $req = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
-        $stmt = $linkpdo->prepare($req);
+        $stmt = $linkpdo->prepare($sql_delete_FDM);
         $stmt->execute([
             ':numero_de_licence' => $numero_de_licence,
             ':id_match_hockey' => $id_match_hockey
