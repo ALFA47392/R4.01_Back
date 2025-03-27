@@ -1,107 +1,116 @@
 <?php
+// Inclusion des fichiers nécessaires à la connexion et aux fonctions
 include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/FunctionsFeuilleDeMatch.php';
+
 // Identification du type de méthode HTTP envoyée par le client
-$http_method = $_SERVER['REQUEST_METHOD']; 
+$http_method = $_SERVER['REQUEST_METHOD'];
 
-switch ($http_method){ 
-    case "GET" : 
-        //Récupération des données dans l’URL si nécessaire
-        if(!isset($_GET['id'])) { 
-            //Appel de la fonction de lecture des phrases 
+switch ($http_method) { 
+    case "GET":
+        // Vérification si un ID est fourni dans l'URL
+        if (!isset($_GET['id'])) { 
+            // Récupération de toutes les feuilles de match
             $matchingData = LireFeuilleMatch($linkpdo);
-            //Réponse à afficher
-            deliver_response(200, "Succès", $matchingData);
-        } else {
-            $idmatchhokey = htmlspecialchars($_GET['id']);
-            //Appel de la fonction de lecture des phrases 
-            $matchingData = LireParticiper($linkpdo, $idmatchhokey);
-            //Réponse à afficher
-            deliver_response(200, "Succès", $matchingData);
-        }
-    break; 
-
-
-    case "POST" :
-        // Vérification de la méthode HTTP
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Récupération et décodage des données JSON envoyées
-            $postedData = file_get_contents('php://input');
-            $data = json_decode(trim($postedData), true);
-    
-            // Vérification que les données existent
-            if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
-                echo json_encode(["status_code" => 400, "status_message" => "Données manquantes"]);
-                exit;
-            }
-    
-            // Appel de la fonction
-            $reponse = createParticiper(
-                $linkpdo, 
-                $data['numero_de_licence'], 
-                $data['id_match_hockey'], 
-                $data['titulaire'], 
-                $data['notation'], 
-                $data['poste']
-            );
-    
-            // Réponse en fonction du succès ou non
-            if ($reponse['success']) {
-                http_response_code(201);
-                echo json_encode(["status_code" => 201, "status_message" => "Données créées avec succès"]);
+            // Vérification si des données ont été récupérées
+            if ($matchingData) {
+                deliver_response(200, "Succès", $matchingData);
             } else {
-                http_response_code(500);
-                echo json_encode(["status_code" => 500, "status_message" => "Erreur serveur", "error" => $reponse['data']]);
+                deliver_response(500, "Erreur serveur lors de la récupération des données", null);
             }
         } else {
-            http_response_code(405);
-            echo json_encode(["status_code" => 405, "status_message" => "Méthode non autorisée"]);
+            // Récupération et sécurisation de l'ID fourni
+            $idmatchhokey = htmlspecialchars($_GET['id']);
+            // Récupération des données pour un match spécifique
+            $matchingData = LireParticiper($linkpdo, $idmatchhokey);
+            if ($matchingData) {
+                deliver_response(200, "Succès", $matchingData);
+            } else {
+                deliver_response(404, "Aucune donnée trouvée pour cet ID", null);
+            }
         }
-    break;
+        break;
 
-
-
-
-case 'PATCH':
-    $postedData = file_get_contents('php://input');
-    $data = json_decode(trim($postedData), true);
-
-    if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
-        deliver_response(400, "Données manquantes", null);
-        exit;
-    }
-
-    $reponse = updateParticiper(
-        $linkpdo,
-        $data['numero_de_licence'],
-        $data['id_match_hockey'],
-        $data['titulaire'],
-        $data['notation'],
-        $data['poste']
-    );
-
-    if ($reponse['success']) {
-        deliver_response(200, "Mise à jour réussie.", $reponse['data']);
-    } else {
-        deliver_response(404, "Aucune mise à jour effectuée.", null);
-    }
-    break;
-
+    case "POST":
+        // Récupération et décodage des données JSON envoyées
+        $postedData = file_get_contents('php://input');
+        $data = json_decode(trim($postedData), true);
     
+        // Vérification de la présence des données requises
+        if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+            deliver_response(400, "Données manquantes", null);
+            exit;
+        }
+    
+        // Appel de la fonction pour ajouter une participation
+        $reponse = createParticiper(
+            $linkpdo, 
+            $data['numero_de_licence'], 
+            $data['id_match_hockey'], 
+            $data['titulaire'], 
+            $data['notation'], 
+            $data['poste']
+        );
+    
+        // Vérification du succès de l'opération
+        if ($reponse['success']) {
+            deliver_response(201, "Données créées avec succès", null);
+        } else {
+            deliver_response(500, "Erreur serveur", $reponse['data']);
+        }
+        break;
+
+    case 'PATCH':
+        // Récupération et décodage des données JSON envoyées
+        $postedData = file_get_contents('php://input');
+        $data = json_decode(trim($postedData), true);
+
+        // Vérification de la présence des données requises
+        if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+            deliver_response(400, "Données manquantes", null);
+            exit;
+        }
+
+        // Appel de la fonction pour mettre à jour une participation
+        $reponse = updateParticiper(
+            $linkpdo,
+            $data['numero_de_licence'],
+            $data['id_match_hockey'],
+            $data['titulaire'],
+            $data['notation'],
+            $data['poste']
+        );
+
+        // Vérification du succès de la mise à jour
+        if ($reponse['success']) {
+            deliver_response(200, "Mise à jour réussie", $reponse['data']);
+        } else {
+            deliver_response(400, "Aucune mise à jour effectuée (données inchangées ou introuvables)", null);
+        }
+        break;
+
     case 'DELETE':
+        // Vérification de la présence des paramètres nécessaires
         if (!isset($_GET['numero_de_licence'], $_GET['id_match_hockey'])) {
             deliver_response(400, "Données manquantes", null);
             exit;
         }
     
+        // Appel de la fonction pour supprimer une participation
         $reponse = deleteParticiper($linkpdo, $_GET['numero_de_licence'], $_GET['id_match_hockey']);
     
+        // Vérification si la suppression a bien eu lieu
         if ($reponse['success']) {
-            deliver_response(200, "Suppression réussie.", $reponse['data']);
+            deliver_response(200, "Suppression réussie", $reponse['data']);
         } else {
-            deliver_response(404, "Aucune suppression effectuée.", null);
+            deliver_response(404, "Aucune donnée trouvée pour suppression", null);
         }
         break;
+
+    default:
+        // Gestion des méthodes HTTP non autorisées
+        deliver_response(405, "Méthode non autorisée", null);
+        break;
 }    
-?> 
+?>

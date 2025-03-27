@@ -4,46 +4,45 @@ include '../Functions/functions.php';
 include '../Functions/functionsStats.php';
 include '../Functions/functionsGeneral.php';
 
-// Identification du type de méthode HTTP envoyée par le client
+// Récupération de la méthode HTTP
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
-// Récupération du token Bearer depuis les headers
+// Récupération et vérification du token Bearer
 $token = get_bearer_token();
-
-//Vérification validité de l'authentification
-verif_auth($token,$auth);
+verif_auth($token, $auth);
 
 switch ($http_method){ 
     case "GET" : 
-        //Récupération des données dans l’URL si nécessaire
+        // Si 'id' est passé en paramètre, on récupère les stats d'un joueur
         if(!isset($_GET['id'])) { 
-            //Appel de la fonction de lecture des phrases 
-            $matchingData=LireListeJoueur($linkpdo);
-            //Réponse à afficher
+            $matchingData = LireListeJoueur($linkpdo);
             deliver_response(200, "Stats de l'équipe bien transmise", $matchingData);
         } else {
-            $matchingData=LireStatsJoueur($linkpdo,$numeroLicence);
-            deliver_response(200, "Stat du joueurs bien transmise", $matchingData);
+            $numeroLicence = htmlspecialchars($_GET['id']);  // Sécurisation de l'ID
+            $matchingData = LireStatsJoueur($linkpdo, $numeroLicence);
+            deliver_response(200, "Stat du joueur bien transmise", $matchingData);
         }
     break; 
+
     case "POST" : 
-    
-    case "PATCH" :
-
+        // Pas d'action définie pour POST pour le moment
     break;
-    case "PUT" :
 
+    case "PATCH" :
+        // Pas d'action définie pour PATCH pour le moment
+    break;
+
+    case "PUT" :
+        // Pas d'action définie pour PUT pour le moment
     break;
 
     case "DELETE" :    
-
+        // Pas d'action définie pour DELETE pour le moment
     break;
-
 
     case "OPTIONS" :
-        deliver_response(404,"Aucune fonction(s) associée(s)",null);
+        // Méthode non gérée, retourne un 405
+        deliver_response(405, "Méthode non autorisée pour OPTIONS", null);
     break;
 }
-
 ?>
-
