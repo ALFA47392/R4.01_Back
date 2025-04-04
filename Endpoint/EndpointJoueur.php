@@ -1,5 +1,4 @@
 <?php
-include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/functionsJoueurs.php';
 include '../Functions/functionsGeneral.php';
@@ -19,14 +18,14 @@ switch ($http_method){
             // Appel de la fonction de lecture des joueurs
             $matchingData = LireListeJoueur($linkpdo);
             // Réponse à afficher
-            deliver_response(200, "Succès", $matchingData);
+            deliver_response(200, "Succès", $matchingData['data']);
         } else {
             $id = htmlspecialchars($_GET['id']);
             // Appel de la fonction de lecture du joueur
             $matchingData = LireJoueur($linkpdo, $id);
             // Réponse à afficher
             if ($matchingData['success']) {
-                deliver_response(200, "Succès", $matchingData);
+                deliver_response(200, "Succès", $matchingData['data']);
             } else {
                 deliver_response(404, "Joueur non trouvé", null);
             }
@@ -39,6 +38,22 @@ switch ($http_method){
         // Récupération des données dans le corps 
         $postedData = file_get_contents('php://input');
         $data = json_decode($postedData, true);
+
+        // Vérification de la présence des données requises
+        if (
+            !isset(
+                $data['numLicence'],
+                $data['Nom'],
+                $data['Prenom'],
+                $data['DateNaissance'],
+                $data['Taille'],
+                $data['Poids'],
+                $data['Statut']
+            )
+        ) {
+            deliver_response(400, "Données manquantes", null);
+            exit;
+        }
 
         $reponse = CréerJoueur($linkpdo, $data['numLicence'], $data['Nom'], $data['Prenom'], $data['DateNaissance'], $data['Taille'], $data['Poids'], $data['Statut']);
 
@@ -68,10 +83,6 @@ switch ($http_method){
         }
     break;
 
-    case "PUT" :
-
-    break;
-
     case "DELETE" :
         if (isset($_GET['id'])) {
             $id = htmlspecialchars($_GET['id']);
@@ -87,8 +98,9 @@ switch ($http_method){
         }
     break;
 
-    case "OPTIONS" :
-        deliver_response(204, "Requête OPTIONS traitée avec succès", null);
+    default:
+    // Méthode HTTP non autorisée
+    deliver_response(405, "Méthode non autorisée", null);
     break;
 }
 ?>

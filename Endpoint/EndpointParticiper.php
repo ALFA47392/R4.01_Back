@@ -1,6 +1,5 @@
 <?php
 // Inclusion des fichiers nécessaires à la connexion et aux fonctions
-include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/FunctionsParticiper.php';
 
@@ -15,7 +14,7 @@ switch ($http_method) {
             $matchingData = LireFeuilleMatch($linkpdo);
             // Vérification si des données ont été récupérées
             if ($matchingData) {
-                deliver_response(200, "Succès", $matchingData);
+                deliver_response(200, "Succès", $matchingData['data']);
             } else {
                 deliver_response(500, "Erreur serveur lors de la récupération des données", null);
             }
@@ -25,7 +24,7 @@ switch ($http_method) {
             // Récupération des données pour un match spécifique
             $matchingData = LireParticiper($linkpdo, $idmatchhokey);
             if ($matchingData) {
-                deliver_response(200, "Succès", $matchingData);
+                deliver_response(200, "Succès", $matchingData['data']);
             } else {
                 deliver_response(404, "Aucune donnée trouvée pour cet ID", null);
             }

@@ -1,5 +1,4 @@
 <?php
-include '../connexionBD.php';
 include '../Functions/functions.php';
 include '../Functions/functionsMatch.php';
 include '../Functions/functionsGeneral.php';
@@ -22,7 +21,7 @@ switch ($http_method){
             if ($reponse['success']==false) {
                 deliver_response(404, "Aucune donnée trouvée.", null);
             } else {
-                deliver_response(200, "Succès", $reponse);
+                deliver_response(200, "Succès", $reponse['data']);
             }
         } else {
             $id = htmlspecialchars($_GET['id']);
@@ -69,10 +68,6 @@ switch ($http_method){
         }
     break;
 
-    case "PUT" :
-        // Ajouter le code pour la mise à jour complète si nécessaire
-    break;
-
     case "DELETE" :    
         if (!isset($_GET['id'])) {
             deliver_response(400, "Paramètre id invalide", null);
@@ -88,8 +83,9 @@ switch ($http_method){
         }
     break;
 
-    case "OPTIONS" :
-        deliver_response(204, "Méthodes autorisées pour cette ressource", null);
+    default:
+    // Méthode HTTP non autorisée
+    deliver_response(405, "Méthode non autorisée", null);
     break;
 }
 ?>
