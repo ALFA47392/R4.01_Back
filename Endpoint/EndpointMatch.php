@@ -18,20 +18,20 @@ switch ($http_method){
         // Récupération des données dans l’URL si nécessaire
         if(!isset($_GET['id'])) { 
             // Appel de la fonction de lecture des phrases 
-            $matchingData = LireListeMatch($linkpdo);
-            if (empty($matchingData)) {
+            $reponse = LireListeMatch($linkpdo);
+            if ($reponse['success']) {
                 deliver_response(204, "Aucune donnée trouvée.", null);
             } else {
-                deliver_response(200, "Succès", $matchingData);
+                deliver_response(200, "Succès", $reponse);
             }
         } else {
             $id = htmlspecialchars($_GET['id']);
             // Appel de la fonction de lecture des phrases 
-            $matchingData = LireMatch($linkpdo, $id);
-            if ($matchingData) {
-                deliver_response(200, "Succès", $matchingData);
+            $reponse = LireMatch($linkpdo, $id);
+            if ($reponse['success']==false) {
+                deliver_response(404, "Aucune match trouvée.", null);
             } else {
-                deliver_response(404, "Match non trouvé", null);
+                deliver_response(200, "Succès", $reponse);
             }
         }
     break; 
@@ -61,7 +61,7 @@ switch ($http_method){
     
             $reponse = patchMatch($linkpdo, $id, $data['Date_Heure_match'], $data['Nom_equipe_adverse'], $data['Lieu_de_rencontre'], $data['ScoreMatch']);
     
-            if ($reponse['success']) {
+            if ($reponse['success']==true) {
                 deliver_response(200, "Données mises à jour avec succès.", $reponse['data']);
             } else {
                 deliver_response(404, "Match non trouvé ou erreur dans la modification", null);

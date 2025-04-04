@@ -38,10 +38,10 @@ switch ($http_method) {
         $data = json_decode(trim($postedData), true);
     
         // Vérification de la présence des données requises
-        // if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
-        //     deliver_response(400, "Données manquantes", null);
-        //     exit;
-        // }
+        if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+            deliver_response(400, "Données manquantes", null);
+            exit;
+        }
     
         // Appel de la fonction pour ajouter une participation
         $reponse = createParticiper(

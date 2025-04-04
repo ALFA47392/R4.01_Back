@@ -69,7 +69,7 @@ switch ($http_method){
     break;
 
     case "PUT" :
-        // Ajouter le code pour la mise à jour complète si nécessaire
+
     break;
 
     case "DELETE" :

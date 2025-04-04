@@ -26,14 +26,24 @@ function LireListematch($linkpdo) {
     }
 }
 
-function LireMatch ($linkpdo,$id) {
-    try{
+function LireMatch($linkpdo, $id) {
+    try {
         global $sql_select_match;
 
         $stmt = $linkpdo->prepare($sql_select_match);
-        $stmt->execute(['Id_Match_Hockey'=>$id]);
+        $stmt->execute(['Id_Match_Hockey' => $id]);
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Vérifie si des données ont été récupérées
+        if (empty($data)) {
+            return [
+                'success' => false,
+                'status_code' => 404,
+                'status_message' => "Aucun match trouvé pour cet ID.",
+                'data' => null
+            ];
+        }
 
         return [
             'success' => true,
@@ -41,15 +51,17 @@ function LireMatch ($linkpdo,$id) {
             'status_message' => "Données récupérées avec succès.",
             'data' => $data
         ];
-    }catch(Exception){
+
+    } catch (Exception $e) {
         return [
             'success' => false,
-            'status_code' => 404,
-            'status_message' => "Not Found",
+            'status_code' => 500,
+            'status_message' => "Erreur : " . $e->getMessage(),
             'data' => null
         ];
     }
-}   
+}
+
 
 function CréerMatch($linkpdo,$idMatch,$Date_Heure_match,$Nom_equipe_adverse,$Lieu_de_rencontre,$scoreMatch){
     try{
