@@ -1,10 +1,11 @@
 <?php
-
+include_once '../SQL/Variables_SQL.php';
 
 function LireParticiper($linkpdo, $idmatchhokey) {
     try {
-        $query = "SELECT * FROM Participer WHERE Id_Match_Hockey = :idmatchhokey";
-        $stmt = $linkpdo->prepare($query);
+        global $sql_select_FDM;
+        
+        $stmt = $linkpdo->prepare($sql_select_FDM);
         $stmt->execute(['idmatchhokey' => $idmatchhokey]);
         
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,10 +29,9 @@ function LireParticiper($linkpdo, $idmatchhokey) {
 
 function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
-        $req = "INSERT INTO `Participer` (`Numero_de_licence`, `Id_Match_Hockey`, `Titulaire`, `Notation`, `Poste`) 
-        VALUES (:numero_de_licence, :id_match_hockey, :titulaire, :notation, :poste)";
+        global $sql_create_participer;
 
-        $stmt = $linkpdo->prepare($req);
+        $stmt = $linkpdo->prepare($sql_create_participer);
  
         $stmt->execute([
             ':numero_de_licence' => $numero_licence,
@@ -52,18 +52,15 @@ function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulair
 
 function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titulaire, $notation, $poste) {
     try {
-        $req = "UPDATE `Participer` 
-                SET Titulaire = :titulaire, Notation = :notation, Poste = :poste
-                WHERE Numero_de_licence = :numero_de_licence 
-                AND Id_Match_Hockey = :id_match_hockey";
-
-        $stmt = $linkpdo->prepare($req);
+        global $sql_update_participer;
+        
+        $stmt = $linkpdo->prepare($sql_update_participer);
         $stmt->execute([
-            ':numero_de_licence' => $numero_de_licence,
-            ':id_match_hockey' => $id_match_hockey,
             ':titulaire' => $titulaire,
             ':notation' => $notation,
-            ':poste' => $poste
+            ':poste' => $poste,
+            ':numero_de_licence' => $numero_de_licence,
+            ':id_match_hockey' => $id_match_hockey
         ]);
 
         if ($stmt->rowCount() > 0) {
@@ -71,25 +68,28 @@ function updateParticiper($linkpdo, $numero_de_licence, $id_match_hockey, $titul
         } else {
             return ['success' => false, 'data' => "Aucune ligne modifiée"];
         }
+
     } catch (Exception $e) {
-        return ['success' => false, 'data' => $e->getMessage()];
+        return ['success' => false, 'data' => 'Erreur : ' . $e->getMessage()];
     }
 }
 
 
+
 function deleteParticiper($linkpdo, $numero_de_licence, $id_match_hockey) {
     try {
-        $req = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
-        $stmt = $linkpdo->prepare($req);
+        global $sql_delete_participer;
+        
+        $stmt = $linkpdo->prepare($sql_delete_participer);
         $stmt->execute([
             ':numero_de_licence' => $numero_de_licence,
             ':id_match_hockey' => $id_match_hockey
         ]);
 
         if ($stmt->rowCount() > 0) {
-            return ['success' => true, 'data' => "Suppression réussie"];
+            return ['success' => true];
         } else {
-            return ['success' => false, 'data' => "Aucune ligne supprimée"];
+            return ['success' => false];
         }
     } catch (Exception $e) {
         return ['success' => false, 'data' => $e->getMessage()];

@@ -4,11 +4,6 @@ include '../Functions/functions.php';
 include '../Functions/functionsJoueurs.php';
 include '../Functions/functionsGeneral.php';
 
-// Assurez-vous que $linkpdo est bien défini
-if (!isset($linkpdo)) {
-    die('Erreur de connexion à la base de données');
-}
-
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
 // Récupération du token Bearer depuis les headers
@@ -20,23 +15,25 @@ verif_auth($token, $auth);
 switch ($http_method){ 
     case "GET" : 
         // Récupération des données dans l’URL si nécessaire
-        if(!isset($_GET['id'])) { 
-            // Appel de la fonction de lecture des joueurs 
+        if (!isset($_GET['id'])) { 
+            // Appel de la fonction de lecture des joueurs
             $matchingData = LireListeJoueur($linkpdo);
             // Réponse à afficher
             deliver_response(200, "Succès", $matchingData);
         } else {
             $id = htmlspecialchars($_GET['id']);
-            // Appel de la fonction de lecture du joueur 
+            // Appel de la fonction de lecture du joueur
             $matchingData = LireJoueur($linkpdo, $id);
             // Réponse à afficher
-            if ($matchingData) {
+            if ($matchingData['success']) {
                 deliver_response(200, "Succès", $matchingData);
             } else {
                 deliver_response(404, "Joueur non trouvé", null);
             }
         }
     break; 
+    
+       
     
     case "POST" : 
         // Récupération des données dans le corps 

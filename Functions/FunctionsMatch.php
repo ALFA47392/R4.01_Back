@@ -1,8 +1,11 @@
 <?php
+include_once '../SQL/Variables_SQL.php';
+
 function LireListematch($linkpdo) {
     try{
-        $query = "SELECT * FROM Match_Hockey";
-        $stmt = $linkpdo->prepare($query);
+        global $sql_select_liste_match;
+
+        $stmt = $linkpdo->prepare($sql_select_liste_match);
         $stmt->execute();
             
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -25,8 +28,9 @@ function LireListematch($linkpdo) {
 
 function LireMatch ($linkpdo,$id) {
     try{
-        $req = "SELECT * FROM Match_Hockey WHERE Id_Match_Hockey = :Id_Match_Hockey";
-        $stmt = $linkpdo->prepare($req);
+        global $sql_select_match;
+
+        $stmt = $linkpdo->prepare($sql_select_match);
         $stmt->execute(['Id_Match_Hockey'=>$id]);
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -49,14 +53,15 @@ function LireMatch ($linkpdo,$id) {
 
 function CréerMatch($linkpdo,$idMatch,$Date_Heure_match,$Nom_equipe_adverse,$Lieu_de_rencontre,$scoreMatch){
     try{
-        $req = "INSERT INTO Match_Hockey (`Id_Match_Hockey`, `Date_Heure_match`, `Nom_equipe_adverse`, `Lieu_de_rencontre`, `ScoreMatch`) VALUES (:Id_Match_Hockey, :Date_Heure_match, :Nom_equipe_adverse, :Lieu_de_rencontre, :ScoreMatch)";
-        $stmt = $linkpdo->prepare($req);
+        global $sql_creer_match;
+        
+        $stmt = $linkpdo->prepare($sql_creer_match);
         $stmt->execute(array(
         'Id_Match_Hockey'=>$idMatch,
         'Date_Heure_match' => $Date_Heure_match,
         'Nom_equipe_adverse' => $Nom_equipe_adverse,
         'Lieu_de_rencontre' => $Lieu_de_rencontre,
-        'ScoreMatch' => $scoreMatch
+        'ScoreMatch' => $scoreMatch));
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
@@ -115,8 +120,8 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
             ];
         }
 
-        $req = "UPDATE Match_Hockey SET " . implode(", ", $fields) . " WHERE id_match_hockey = :idMatch";
-        $stmt = $linkpdo->prepare($req);
+        $sql_modif_match = "UPDATE Match_Hockey SET " . implode(", ", $fields) . " WHERE id_match_hockey = :idMatch";
+        $stmt = $linkpdo->prepare($sql_modif_match);
         $stmt->execute($params);
 
         // Récupérer les nouvelles données après la mise à jour
@@ -153,12 +158,14 @@ function deleteMatch($linkpdo,$id){
     }
 
     try{
-        $req = "DELETE FROM match_hockey WHERE Id_match_hockey = :idMatch";
-        $stmt = $linkpdo->prepare($req);
+        global $sql_delete_match;
+        
+        $stmt = $linkpdo->prepare($sql_delete_match);
         $stmt->execute(['idMatch'=>$id]);
 
-        $req2 = "DELETE FROM Participer WHERE Id_match_hockey = :idMatch";
-        $stmt = $linkpdo->prepare($req2);
+        global $sql_delete_match_FDM;
+        
+        $stmt = $linkpdo->prepare($sql_delete_match_FDM);
         $stmt->execute(['idMatch'=>$id]);
     
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

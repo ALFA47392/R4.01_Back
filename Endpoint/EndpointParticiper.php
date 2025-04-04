@@ -2,7 +2,7 @@
 // Inclusion des fichiers nécessaires à la connexion et aux fonctions
 include '../connexionBD.php';
 include '../Functions/functions.php';
-include '../Functions/FunctionsFeuilleDeMatch.php';
+include '../Functions/FunctionsParticiper.php';
 
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD'];
@@ -38,10 +38,10 @@ switch ($http_method) {
         $data = json_decode(trim($postedData), true);
     
         // Vérification de la présence des données requises
-        if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
-            deliver_response(400, "Données manquantes", null);
-            exit;
-        }
+        // if (!isset($data['numero_de_licence'], $data['id_match_hockey'], $data['titulaire'], $data['notation'], $data['poste'])) {
+        //     deliver_response(400, "Données manquantes", null);
+        //     exit;
+        // }
     
         // Appel de la fonction pour ajouter une participation
         $reponse = createParticiper(
@@ -57,7 +57,7 @@ switch ($http_method) {
         if ($reponse['success']) {
             deliver_response(201, "Données créées avec succès", null);
         } else {
-            deliver_response(500, "Erreur serveur", $reponse['data']);
+            deliver_response(400, "Erreur lors de la saisies des données", $reponse['data']);
         }
         break;
 
@@ -86,7 +86,7 @@ switch ($http_method) {
         if ($reponse['success']) {
             deliver_response(200, "Mise à jour réussie", $reponse['data']);
         } else {
-            deliver_response(400, "Aucune mise à jour effectuée (données inchangées ou introuvables)", null);
+            deliver_response(400, "Erreur du traitement des données", null);
         }
         break;
 
@@ -102,9 +102,9 @@ switch ($http_method) {
     
         // Vérification si la suppression a bien eu lieu
         if ($reponse['success']) {
-            deliver_response(200, "Suppression réussie", $reponse['data']);
+            deliver_response(200, "Suppression réussie", null);
         } else {
-            deliver_response(404, "Aucune donnée trouvée pour suppression", null);
+            deliver_response(404, "Aucunes données supprimées", null);
         }
         break;
 
