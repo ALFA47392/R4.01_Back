@@ -94,7 +94,6 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
     try {
         global $sqlPatchJoueurBase;
 
-        // Vérifie si le joueur existe
         $joueurExistant = LireJoueur($linkpdo, $id);
         if (!$joueurExistant['success'] || empty($joueurExistant['data'])) {
             return [
@@ -105,16 +104,41 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
             ];
         }
 
-        // Préparation des champs à mettre à jour
         $fields = [];
         $params = ['id' => $id];
 
-        if ($nom !== null) $fields[] = "Nom = :Nom" && $params['Nom'] = $nom;
-        if ($prenom !== null) $fields[] = "Prenom = :Prenom" && $params['Prenom'] = $prenom;
-        if ($dateNaissance !== null) $fields[] = "Date_de_naissance = :Date_de_naissance" && $params['Date_de_naissance'] = $dateNaissance;
-        if ($taille !== null) $fields[] = "Taille = :Taille" && $params['Taille'] = $taille;
-        if ($poids !== null) $fields[] = "Poids = :Poids" && $params['Poids'] = $poids;
-        if ($statut !== null) $fields[] = "Statut = :Statut" && $params['Statut'] = $statut;
+        if ($nom !== null) {
+            $fields[] = "Nom = :Nom";
+            $params['Nom'] = $nom;
+        }
+
+        if ($prenom !== null) {
+            $fields[] = "Prenom = :Prenom";
+            $params['Prenom'] = $prenom;
+        }
+
+        if ($dateNaissance !== null) {
+            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateNaissance)) {
+                $dateNaissance = DateTime::createFromFormat('d/m/Y', $dateNaissance)->format('Y-m-d');
+            }
+            $fields[] = "Date_de_naissance = :Date_de_naissance";
+            $params['Date_de_naissance'] = $dateNaissance;
+        }
+
+        if ($taille !== null) {
+            $fields[] = "Taille = :Taille";
+            $params['Taille'] = $taille;
+        }
+
+        if ($poids !== null) {
+            $fields[] = "Poids = :Poids";
+            $params['Poids'] = $poids;
+        }
+
+        if ($statut !== null) {
+            $fields[] = "Statut = :Statut";
+            $params['Statut'] = $statut;
+        }
 
         if (empty($fields)) {
             return [
@@ -125,12 +149,10 @@ function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poi
             ];
         }
 
-        // Construction finale de la requête
         $sql = $sqlPatchJoueurBase . implode(", ", $fields) . " WHERE Numero_de_licence = :id";
         $stmt = $linkpdo->prepare($sql);
         $stmt->execute($params);
 
-        // Retourner les nouvelles données
         $joueurMisAJour = LireJoueur($linkpdo, $id);
         return [
             'success' => true,

@@ -10,6 +10,7 @@ WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hoc
 
 $sql_delete_FDM = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
 
+
 // JOUEUR
 $sql_select_un_joueur = "SELECT * FROM joueur";
 
@@ -23,6 +24,7 @@ $sqlVerifierExistenceJoueur = "SELECT * FROM Joueur WHERE Numero_de_licence = ?"
 
 $sql_delete_joueur = "DELETE FROM joueur WHERE Numero_de_licence = :id";
 
+
 // MATCH
 $sql_select_liste_match = "SELECT * FROM Match_Hockey";
 
@@ -30,11 +32,12 @@ $sql_select_match = "SELECT * FROM Match_Hockey WHERE Id_Match_Hockey = :Id_Matc
 
 $sql_creer_match = "INSERT INTO Match_Hockey (`Id_Match_Hockey`, `Date_Heure_match`, `Nom_equipe_adverse`, `Lieu_de_rencontre`, `ScoreMatch`) VALUES (:Id_Match_Hockey, :Date_Heure_match, :Nom_equipe_adverse, :Lieu_de_rencontre, :ScoreMatch)";
 
-//
+$sqlPatchMatchBase = "UPDATE Match_Hockey SET ";
 
 $sql_delete_match = "DELETE FROM match_hockey WHERE Id_match_hockey = :idMatch";
 
 $sql_delete_match_FDM = "DELETE FROM Participer WHERE Id_match_hockey = :idMatch";
+
 
 // PARTICIPER
 $sql_select_FDM = "SELECT * FROM Participer WHERE Id_Match_Hockey = :idmatchhokey";
@@ -46,6 +49,7 @@ $sql_update_participer = "UPDATE Participer SET Titulaire = :titulaire, Notation
                 WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
 
 $sql_delete_participer = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de_licence AND Id_Match_Hockey = :id_match_hockey";
+
 
 //STATS
 $sql_joueurs_base = "SELECT Numero_de_licence, Nom, Prenom, Statut FROM Joueur";
@@ -92,6 +96,7 @@ $sql_stats_equipe = "
     FROM Match_Hockey 
     WHERE Date_Heure_match < ?
 ";
+
 
 // Requêtes pour LireStatsJoueur
 $sql_info_joueur = "SELECT Numero_de_licence, Nom, Prenom, Statut FROM Joueur WHERE Numero_de_licence = ?";

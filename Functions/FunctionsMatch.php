@@ -78,9 +78,10 @@ function CréerMatch($linkpdo,$idMatch,$Date_Heure_match,$Nom_equipe_adverse,$Li
 
 function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, $Lieu_de_rencontre, $scoreMatch) {
     try {
-        // Vérifier si le joueur existe en utilisant LireJoueur
+        global $sqlPatchMatchBase;
+
+        // Vérifie si le match existe
         $matchExistant = LireMatch($linkpdo, $idMatch);
-        
         if (!$matchExistant['success'] || empty($matchExistant['data'])) {
             return [
                 'success' => false,
@@ -98,14 +99,17 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
             $fields[] = "Date_Heure_match = :Date_Heure_match";
             $params['Date_Heure_match'] = $Date_Heure_match;
         }
+
         if (isset($Nom_equipe_adverse)) {
             $fields[] = "Nom_equipe_adverse = :Nom_equipe_adverse";
             $params['Nom_equipe_adverse'] = $Nom_equipe_adverse;
         }
+
         if (isset($Lieu_de_rencontre)) {
             $fields[] = "Lieu_de_rencontre = :Lieu_de_rencontre";
             $params['Lieu_de_rencontre'] = $Lieu_de_rencontre;
         }
+
         if (isset($scoreMatch)) {
             $fields[] = "ScoreMatch = :ScoreMatch";
             $params['ScoreMatch'] = $scoreMatch;
@@ -120,20 +124,20 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
             ];
         }
 
-        $sql_modif_match = "UPDATE Match_Hockey SET " . implode(", ", $fields) . " WHERE id_match_hockey = :idMatch";
-        $stmt = $linkpdo->prepare($sql_modif_match);
+        // Construction de la requête SQL
+        $sql = $sqlPatchMatchBase . implode(", ", $fields) . " WHERE id_match_hockey = :idMatch";
+        $stmt = $linkpdo->prepare($sql);
         $stmt->execute($params);
 
-        // Récupérer les nouvelles données après la mise à jour
+        // Récupérer les nouvelles données après mise à jour
         $matchMisAJour = LireMatch($linkpdo, $idMatch);
-        
-
         return [
             'success' => true,
             'status_code' => 200,
-            'status_message' => "Joueur mis à jour avec succès",
+            'status_message' => "Match mis à jour avec succès",
             'data' => $matchMisAJour['data']
         ];
+
     } catch (Exception $e) {
         return [
             'success' => false,
@@ -143,6 +147,7 @@ function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, 
         ];
     }
 }
+
 
 function deleteMatch($linkpdo,$id){
     // Vérifier si le joueur existe en utilisant LireJoueur
