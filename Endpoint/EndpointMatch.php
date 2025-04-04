@@ -19,8 +19,8 @@ switch ($http_method){
         if(!isset($_GET['id'])) { 
             // Appel de la fonction de lecture des phrases 
             $reponse = LireListeMatch($linkpdo);
-            if ($reponse['success']) {
-                deliver_response(204, "Aucune donnée trouvée.", null);
+            if ($reponse['success']==false) {
+                deliver_response(404, "Aucune donnée trouvée.", null);
             } else {
                 deliver_response(200, "Succès", $reponse);
             }
@@ -31,7 +31,7 @@ switch ($http_method){
             if ($reponse['success']==false) {
                 deliver_response(404, "Aucune match trouvée.", null);
             } else {
-                deliver_response(200, "Succès", $reponse);
+                deliver_response(200, "Succès", $reponse['data']);
             }
         }
     break; 
@@ -43,7 +43,7 @@ switch ($http_method){
 
         $reponse = CréerMatch($linkpdo, $data['Id_Match_Hockey'], $data['Date_Heure_match'], $data['Nom_equipe_adverse'], $data['Lieu_de_rencontre'], $data['ScoreMatch']);
 
-        if ($reponse['success']) {
+        if ($reponse['success']==true) {
             deliver_response(201, "Données créées avec succès.", $reponse['data']);
         } else {
             deliver_response(400, "Erreur lors de la création des données.", null);
@@ -80,7 +80,7 @@ switch ($http_method){
             $id = htmlspecialchars($_GET['id']);
             $reponse = deleteMatch($linkpdo, $id);
             
-            if ($reponse['success']) {
+            if ($reponse['success']==true) {
                 deliver_response(200, "Match avec l'ID $id supprimé avec succès.", $reponse['data']);
             } else {
                 deliver_response(404, "Match non trouvé", null);

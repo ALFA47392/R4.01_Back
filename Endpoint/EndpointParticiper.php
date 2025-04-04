@@ -54,8 +54,8 @@ switch ($http_method) {
         );
     
         // Vérification du succès de l'opération
-        if ($reponse['success']) {
-            deliver_response(201, "Données créées avec succès", null);
+        if ($reponse['success']==true) {
+            deliver_response(201, "Données créées avec succès", $reponse['data']);
         } else {
             deliver_response(400, "Erreur lors de la saisies des données", $reponse['data']);
         }
