@@ -1,6 +1,6 @@
 <?php
 // Inclusion du fichier contenant les variables SQL utilisées pour les requêtes
-include_once '../SQL/Variables_SQL.php';
+include_once ('../SQL/Variables_SQL.php');
 
 // Fonction pour récupérer la liste de tous les matchs
 function LireListematch($linkpdo) {
@@ -78,7 +78,7 @@ function LireMatch($linkpdo, $id) {
 function CréerMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, $Lieu_de_rencontre, $scoreMatch) {
     try {
         global $sql_creer_match;
-        
+
         // Préparation et exécution de la requête d'insertion pour créer un match
         $stmt = $linkpdo->prepare($sql_creer_match);
         $stmt->execute(array(
@@ -92,19 +92,32 @@ function CréerMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse,
         // Récupération des données après l'insertion (si nécessaire)
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Retour des données créées
-        return [
-            'success' => true,
-            'data' => $data,
-        ];
-    } catch (Exception) {
-        // En cas d'erreur, retour d'une réponse d'échec
+        // Si l'insertion est réussie, retour d'une réponse avec les données du match
+        if ($data) {
+            deliver_response(200, "Match créé avec succès.", $data);
+            return [
+                'success' => true,
+                'data' => $data,
+            ];
+        } else {
+            // Si aucune donnée n'a été insérée, renvoyer une réponse d'échec
+            deliver_response(400, "Aucune donnée insérée, peut-être que le match existe déjà ?", null);
+            return [
+                'success' => false,
+                'data' => null,
+            ];
+        }
+
+    } catch (Exception $e) {
+        // Gestion des erreurs en cas d'exception
+        deliver_response(500, "Erreur interne du serveur : " . $e->getMessage(), null);
         return [
             'success' => false,
             'data' => null
         ];
     }
 }
+
 
 // Fonction pour mettre à jour un match existant
 function patchMatch($linkpdo, $idMatch, $Date_Heure_match, $Nom_equipe_adverse, $Lieu_de_rencontre, $scoreMatch) {

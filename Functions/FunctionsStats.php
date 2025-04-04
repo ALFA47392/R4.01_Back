@@ -1,5 +1,5 @@
 <?php
-include_once '../SQL/Variables_SQL.php';
+include_once ('../SQL/Variables_SQL.php');
 
 // Fonction pour lire la liste de tous les joueurs avec leurs statistiques
 function LireListeJoueur($linkpdo) {

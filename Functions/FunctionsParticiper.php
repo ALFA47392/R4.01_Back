@@ -1,18 +1,33 @@
 <?php
 // Inclusion du fichier contenant les variables SQL utilisées pour les requêtes
-include_once '../SQL/Variables_SQL.php';
+include_once ('../SQL/Variables_SQL.php');
 
 // Fonction pour lire les informations de participation d'un match spécifique
 function LireParticiper($linkpdo, $idmatchhokey) {
     try {
         global $sql_select_FDM;
-        
+
         // Préparation et exécution de la requête SQL pour récupérer les participations pour un match donné
         $stmt = $linkpdo->prepare($sql_select_FDM);
-        $stmt->execute(['idmatchhokey' => $idmatchhokey]);
+        $stmt->execute(['idmatchhockey' => $idmatchhokey]);
         
         // Récupération des résultats sous forme de tableau associatif
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Vérification si des résultats ont été trouvés
+        if (empty($data)) {
+            // Retour si aucune participation n'a été trouvée
+            deliver_response(404, "Aucune participation trouvée pour ce match.", null);
+            return [
+                'success' => false,
+                'status_code' => 404,
+                'status_message' => "Aucune participation trouvée pour ce match.",
+                'data' => null
+            ];
+        }
+
+        // Log de succès si des participations sont trouvées
+        deliver_response(200, "Participations récupérées avec succès.", $data);
 
         // Retour des données des participations
         return [
@@ -25,12 +40,13 @@ function LireParticiper($linkpdo, $idmatchhokey) {
         // En cas d'erreur, retour d'une réponse d'échec avec message d'erreur
         return [
             'success' => false,
-            'status_code' => 404,
-            'status_message' => "Not Found",
+            'status_code' => 500,
+            'status_message' => "Erreur interne du serveur : " . $e->getMessage(),
             'data' => null
         ];
     }
 }
+
 
 // Fonction pour créer une participation d'un joueur dans un match
 function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulaire, $notation, $poste) {
@@ -42,7 +58,7 @@ function createParticiper($linkpdo, $numero_licence, $id_match_hockey, $titulair
 
         // Récupération des résultats sous forme de tableau associatif
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
- 
+
         $stmt->execute([
             ':numero_de_licence' => $numero_licence,
             ':id_match_hockey' => $id_match_hockey,

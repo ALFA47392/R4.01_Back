@@ -1,7 +1,7 @@
 <?php
 // Inclusion des fichiers nécessaires à la connexion et aux fonctions
-include '../Functions/functions.php';
-include '../Functions/FunctionsParticiper.php';
+include ('../Functions/functions.php');
+include ('../Functions/FunctionsParticiper.php');
 
 // Identification du type de méthode HTTP envoyée par le client
 $http_method = $_SERVER['REQUEST_METHOD'];

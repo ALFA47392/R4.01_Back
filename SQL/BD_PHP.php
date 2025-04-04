@@ -1,7 +1,7 @@
 <?php
 include '../connexionBD.php';
 // MISE EN PLACE BD
-$sql = file_get_contents("./SQL/Creation_BD.sql");
+$sql = file_get_contents("./Creation_BD.sql");
 try{
     $linkpdo->exec($sql);
     echo '<div class="success">Mise en place de la BD réussie</div>';
@@ -11,7 +11,7 @@ try{
 }
 
 // INSERT JEU DE TEST
-$sql = file_get_contents("./SQL/jeuDeTest.sql");
+$sql = file_get_contents("./JeuDeTest.sql");
 try{
     $linkpdo->exec($sql);
     echo '<div class="success">Insert du jeu de test de la BD réussie</div>';

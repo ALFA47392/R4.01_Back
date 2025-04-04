@@ -1,11 +1,3 @@
-CREATE DATABASE IF NOT EXISTS projetr401;
-USE projetr401;
-
-DROP TABLE IF EXISTS Participer;
-DROP TABLE IF EXISTS Commentaire;
-DROP TABLE IF EXISTS Match_Hockey;
-DROP TABLE IF EXISTS Joueur;
-
 -- Création des tables
 CREATE TABLE Joueur(
    Numero_de_licence CHAR(10) ,

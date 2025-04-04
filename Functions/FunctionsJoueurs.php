@@ -1,7 +1,7 @@
 <?php
 
 // Inclusion du fichier contenant les variables SQL utilisées pour les requêtes
-include_once '../SQL/Variables_SQL.php';
+include_once ('../SQL/Variables_SQL.php');
 
 // Fonction pour récupérer la liste de tous les joueurs
 function LireListeJoueur($linkpdo) {
@@ -9,27 +9,43 @@ function LireListeJoueur($linkpdo) {
         // Utilisation de la requête SQL définie pour sélectionner les joueurs
         global $sql_select_un_joueur;
 
-        $stmt = $linkpdo->prepare($sql_select_un_joueur);  // Préparation de la requête
+        // Préparation de la requête
+        $stmt = $linkpdo->prepare($sql_select_un_joueur);  
         $stmt->execute();  // Exécution de la requête
-            
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);  // Récupération des résultats sous forme de tableau associatif
 
+        // Récupération des résultats sous forme de tableau associatif
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Vérification si des données ont été récupérées
+        if (empty($data)) {
+            // Si aucune donnée n'a été trouvée, renvoyer une réponse pour cela
+            deliver_response(404, "Aucun joueur trouvé.", null);
+        }
+
+        // Si des données ont été récupérées, on les renvoie
+        deliver_response(200, "Données récupérées avec succès.", $data);
+
+        // Retour d'une réponse positive si des données sont présentes
         return [
             'success' => true,
             'status_code' => 200,
             'status_message' => "Données récupérées avec succès.",  // Retour d'une réponse positive
             'data' => $data
         ];
-    } catch (Exception) {
+
+    } catch (Exception $e) {
         // En cas d'erreur lors de l'exécution, retour d'une réponse d'erreur
+        deliver_response(500, "Erreur lors de l'exécution de la requête SQL : " . $e->getMessage(), null);
+        
         return [
             'success' => false,
-            'status_code' => 404,
-            'status_message' => "Not Found",  // Message d'erreur
+            'status_code' => 500,
+            'status_message' => "Erreur interne du serveur : " . $e->getMessage(),  // Message d'erreur détaillé
             'data' => null
         ];
     }
 }
+
 
 // Fonction pour récupérer un joueur spécifique par son numéro de licence
 function LireJoueur($linkpdo, $id) {
@@ -74,8 +90,11 @@ function LireJoueur($linkpdo, $id) {
 function CréerJoueur($linkpdo, $numLicence, $nom, $prenom, $dateNaissance, $taille, $poids, $statut) {
     try {
         global $sql_create_joueur;
+
         // Préparation et exécution de la requête pour insérer un nouveau joueur
         $stmt = $linkpdo->prepare($sql_create_joueur);
+
+        // Essayer d'exécuter la requête
         $stmt->execute(array(
             'Numero_de_licence' => $numLicence,
             'Nom' => $nom,
@@ -86,20 +105,36 @@ function CréerJoueur($linkpdo, $numLicence, $nom, $prenom, $dateNaissance, $tai
             'Statut' => $statut
         ));
 
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);  // Récupération des données de l'insertion (si nécessaire)
+        // Vérification si une ligne a été insérée
+        $rowCount = $stmt->rowCount();
 
-        return [
-            'success' => true,
-            'data' => $data,  // Retour des données créées
-        ];
-    } catch (Exception) {
-        // Retour d'une réponse d'erreur si une exception est levée
+        if ($rowCount > 0) {
+
+            $joueurData = LireJoueur($linkpdo, $numLicence);  // Récupération des données du joueur inséré
+            // Si la requête a modifié des données, renvoyer une réponse positive
+            // Retour des données si le joueur a été trouvé
+            return [
+                'success' => true,
+                'status_code' => 200,
+                'status_message' => "Données récupérées avec succès.",
+                'data' => $joueurData['data']
+            ];
+        } else {
+            // Si aucune ligne n'a été insérée
+            deliver_response(400, "Aucune donnée insérée, peut-être que le joueur existe déjà ?", null);
+        }
+        
+    } catch (Exception $e) {
+        // En cas d'exception, renvoyer une réponse d'erreur
         return [
             'success' => false,
+            'status_code' => 500,
+            'status_message' => "Erreur interne du serveur : " . $e->getMessage(),
             'data' => null
         ];
     }
 }
+
 
 // Fonction pour mettre à jour les informations d'un joueur
 function patchJoueur($linkpdo, $id, $nom, $prenom, $dateNaissance, $taille, $poids, $statut) {

@@ -1,7 +1,6 @@
 -- Supprimer les données existantes si elles existent
 DELETE FROM Participer;
 DELETE FROM Commentaire;
-DELETE FROM Connexion;
 DELETE FROM Match_Hockey;
 DELETE FROM Joueur;
 

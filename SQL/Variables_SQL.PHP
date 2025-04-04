@@ -12,17 +12,17 @@ $sql_delete_FDM = "DELETE FROM `Participer` WHERE Numero_de_licence = :numero_de
 
 
 // JOUEUR
-$sql_select_un_joueur = "SELECT * FROM joueur";
+$sql_select_un_joueur = "SELECT * FROM Joueur";
 
-$sql_select_joueurs = "SELECT * FROM joueur WHERE Numero_de_licence = :Numero_de_licence";
+$sql_select_joueurs = "SELECT * FROM Joueur WHERE Numero_de_licence = :Numero_de_licence";
 
-$sql_create_joueur = "INSERT INTO joueur (`Numero_de_licence`, `Nom`, `Prenom`, `Date_de_naissance`, `Taille`, `Poids`, `Statut`) VALUES (:Numero_de_licence, :Nom, :Prenom, :Date_de_naissance, :Taille, :Poids, :Statut)";
+$sql_create_joueur = "INSERT INTO Joueur (`Numero_de_licence`, `Nom`, `Prenom`, `Date_de_naissance`, `Taille`, `Poids`, `Statut`) VALUES (:Numero_de_licence, :Nom, :Prenom, :Date_de_naissance, :Taille, :Poids, :Statut)";
 
 $sqlPatchJoueurBase = "UPDATE Joueur SET ";  // Le WHERE est ajouté plus tard
 
 $sqlVerifierExistenceJoueur = "SELECT * FROM Joueur WHERE Numero_de_licence = ?";
 
-$sql_delete_joueur = "DELETE FROM joueur WHERE Numero_de_licence = :id";
+$sql_delete_joueur = "DELETE FROM Joueur WHERE Numero_de_licence = :id";
 
 
 // MATCH
@@ -34,13 +34,13 @@ $sql_creer_match = "INSERT INTO Match_Hockey (`Id_Match_Hockey`, `Date_Heure_mat
 
 $sqlPatchMatchBase = "UPDATE Match_Hockey SET ";
 
-$sql_delete_match = "DELETE FROM match_hockey WHERE Id_match_hockey = :idMatch";
+$sql_delete_match = "DELETE FROM Match_Hockey WHERE Id_Match_Hockey = :idMatch";
 
-$sql_delete_match_FDM = "DELETE FROM Participer WHERE Id_match_hockey = :idMatch";
+$sql_delete_match_FDM = "DELETE FROM Participer WHERE Id_Match_Hockey = :idMatch";
 
 
 // PARTICIPER
-$sql_select_FDM = "SELECT * FROM Participer WHERE Id_Match_Hockey = :idmatchhokey";
+$sql_select_FDM = "SELECT * FROM Participer WHERE Id_Match_Hockey = :idmatchhockey";
 
 $sql_create_participer = "INSERT INTO `Participer` (`Numero_de_licence`, `Id_Match_Hockey`, `Titulaire`, `Notation`, `Poste`) 
         VALUES (:numero_de_licence, :id_match_hockey, :titulaire, :notation, :poste)";
@@ -111,9 +111,4 @@ $sql_titularisations_joueur_total = "SELECT COUNT(*)
                                      AND P.Titulaire = 1";
 
 $sql_total_matchs_global = "SELECT COUNT(*) FROM Match_Hockey WHERE Date_Heure_match < NOW()";
-
-
-// GENERAL
-  
-    
 ?>

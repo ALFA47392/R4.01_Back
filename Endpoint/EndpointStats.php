@@ -1,7 +1,7 @@
 <?php
-include '../Functions/functions.php';
-include '../Functions/functionsStats.php';
-include '../Functions/functionsGeneral.php';
+include ('../Functions/functions.php');
+include ('../Functions/FunctionsStats.php');
+include ('../Functions/FunctionsGeneral.php');
 
 // Récupération de la méthode HTTP
 $http_method = $_SERVER['REQUEST_METHOD']; 

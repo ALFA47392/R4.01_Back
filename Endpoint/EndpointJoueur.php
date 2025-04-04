@@ -1,7 +1,7 @@
 <?php
-include '../Functions/functions.php';
-include '../Functions/functionsJoueurs.php';
-include '../Functions/functionsGeneral.php';
+include ('../Functions/functions.php');
+include ('../Functions/FunctionsJoueurs.php');
+include ('../Functions/FunctionsGeneral.php');
 
 $http_method = $_SERVER['REQUEST_METHOD']; 
 
@@ -24,7 +24,7 @@ switch ($http_method){
             // Appel de la fonction de lecture du joueur
             $matchingData = LireJoueur($linkpdo, $id);
             // Réponse à afficher
-            if ($matchingData['success']) {
+            if ($matchingData['success']==true) {
                 deliver_response(200, "Succès", $matchingData['data']);
             } else {
                 deliver_response(404, "Joueur non trouvé", null);
@@ -57,7 +57,7 @@ switch ($http_method){
 
         $reponse = CréerJoueur($linkpdo, $data['numLicence'], $data['Nom'], $data['Prenom'], $data['DateNaissance'], $data['Taille'], $data['Poids'], $data['Statut']);
 
-        if ($reponse['success']) {
+        if ($reponse['success']==true) {
             deliver_response(201, "Données créées avec succès.", $reponse['data']);
         } else {
             deliver_response(400, "Erreur lors de la création des données.", null);

@@ -1,6 +1,6 @@
 <?php
 
-$auth = 'http://127.0.0.1/R4.01_Auth/Endpoint/EndpointAuth.php'; // Remplacez par l'URL du service d'authentification
+$auth = 'https://r401hockeyauth.alwaysdata.net/Endpoint/EndpointAuth.php'; // Remplacez par l'URL du service d'authentification
 
 function get_authorization_header(){
 	$headers = null;
